@@ -4,6 +4,7 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { ThemeProvider } from "@/components/ThemeProvider";
+import { AuthGuard } from "@/components/AuthGuard";
 
 // Public pages
 import Index from "./pages/Index";
@@ -62,26 +63,26 @@ const App = () => (
             <Route path="/auth" element={<Auth />} />
             <Route path="/maintenance" element={<Maintenance />} />
 
-            {/* Client Routes */}
-            <Route path="/client" element={<ClientDashboard />} />
-            <Route path="/client/projects" element={<ClientProjects />} />
-            <Route path="/client/licenses" element={<ClientLicenses />} />
-            <Route path="/client/billing" element={<ClientBilling />} />
-            <Route path="/client/support" element={<ClientSupport />} />
-            <Route path="/client/settings" element={<ClientSettings />} />
+            {/* Client Portal Routes - Protected */}
+            <Route path="/client" element={<AuthGuard><ClientDashboard /></AuthGuard>} />
+            <Route path="/client/projects" element={<AuthGuard><ClientProjects /></AuthGuard>} />
+            <Route path="/client/licenses" element={<AuthGuard><ClientLicenses /></AuthGuard>} />
+            <Route path="/client/billing" element={<AuthGuard><ClientBilling /></AuthGuard>} />
+            <Route path="/client/support" element={<AuthGuard><ClientSupport /></AuthGuard>} />
+            <Route path="/client/settings" element={<AuthGuard><ClientSettings /></AuthGuard>} />
 
-            {/* Admin Routes */}
-            <Route path="/admin" element={<AdminDashboard />} />
-            <Route path="/admin/users" element={<AdminUsers />} />
-            <Route path="/admin/projects" element={<AdminProjects />} />
-            <Route path="/admin/licenses" element={<AdminLicenses />} />
-            <Route path="/admin/billing" element={<AdminBilling />} />
-            <Route path="/admin/content" element={<AdminContent />} />
-            <Route path="/admin/support" element={<AdminSupport />} />
-            <Route path="/admin/analytics" element={<AdminAnalytics />} />
-            <Route path="/admin/settings" element={<AdminSettings />} />
-            <Route path="/admin/integrations" element={<AdminIntegrations />} />
-            <Route path="/admin/activity-logs" element={<AdminActivityLogs />} />
+            {/* Admin Panel Routes - Admin Only */}
+            <Route path="/admin" element={<AuthGuard requireAdmin><AdminDashboard /></AuthGuard>} />
+            <Route path="/admin/users" element={<AuthGuard requireAdmin><AdminUsers /></AuthGuard>} />
+            <Route path="/admin/projects" element={<AuthGuard requireAdmin><AdminProjects /></AuthGuard>} />
+            <Route path="/admin/licenses" element={<AuthGuard requireAdmin><AdminLicenses /></AuthGuard>} />
+            <Route path="/admin/billing" element={<AuthGuard requireAdmin><AdminBilling /></AuthGuard>} />
+            <Route path="/admin/content" element={<AuthGuard requireAdmin><AdminContent /></AuthGuard>} />
+            <Route path="/admin/support" element={<AuthGuard requireAdmin><AdminSupport /></AuthGuard>} />
+            <Route path="/admin/analytics" element={<AuthGuard requireAdmin><AdminAnalytics /></AuthGuard>} />
+            <Route path="/admin/settings" element={<AuthGuard requireAdmin><AdminSettings /></AuthGuard>} />
+            <Route path="/admin/integrations" element={<AuthGuard requireAdmin><AdminIntegrations /></AuthGuard>} />
+            <Route path="/admin/activity-logs" element={<AuthGuard requireAdmin><AdminActivityLogs /></AuthGuard>} />
 
             {/* 404 */}
             <Route path="*" element={<NotFound />} />

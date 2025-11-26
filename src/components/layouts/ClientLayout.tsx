@@ -1,4 +1,4 @@
-import { Link, useLocation } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import {
   LayoutDashboard,
   FolderKanban,
@@ -8,12 +8,22 @@ import {
   Settings,
   Search,
   Bell,
+  LogOut,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { ThemeToggle } from "@/components/ThemeToggle";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 import { cn } from "@/lib/utils";
+import { useAuth } from "@/hooks/useAuth";
 
 const sidebarItems = [
   { icon: LayoutDashboard, label: "Dashboard", href: "/client" },
@@ -26,6 +36,21 @@ const sidebarItems = [
 
 export function ClientLayout({ children }: { children: React.ReactNode }) {
   const location = useLocation();
+  const navigate = useNavigate();
+  const { user, profile, signOut } = useAuth();
+
+  const handleSignOut = async () => {
+    await signOut();
+    navigate("/auth");
+  };
+
+  const userInitials = profile?.full_name
+    ?.split(" ")
+    .map((n) => n[0])
+    .join("")
+    .toUpperCase() || user?.email?.[0].toUpperCase() || "U";
+
+  const userAvatar = profile?.avatar_url || `https://api.dicebear.com/7.x/avataaars/svg?seed=${user?.id}`;
 
   return (
     <div className="flex min-h-screen w-full">
@@ -67,12 +92,12 @@ export function ClientLayout({ children }: { children: React.ReactNode }) {
         <div className="p-4 border-t">
           <div className="flex items-center space-x-3">
             <Avatar className="h-8 w-8">
-              <AvatarImage src="https://api.dicebear.com/7.x/avataaars/svg?seed=Sarah" />
-              <AvatarFallback>SJ</AvatarFallback>
+              <AvatarImage src={userAvatar} />
+              <AvatarFallback>{userInitials}</AvatarFallback>
             </Avatar>
             <div className="flex-1 min-w-0">
-              <p className="text-sm font-medium">Sarah Johnson</p>
-              <p className="text-xs text-muted-foreground truncate">sarah.j@example.com</p>
+              <p className="text-sm font-medium">{profile?.full_name || "User"}</p>
+              <p className="text-xs text-muted-foreground truncate">{user?.email}</p>
             </div>
           </div>
         </div>
@@ -96,10 +121,34 @@ export function ClientLayout({ children }: { children: React.ReactNode }) {
             <Button variant="ghost" size="icon" className="relative">
               <Bell className="h-5 w-5" />
             </Button>
-            <Avatar className="h-8 w-8">
-              <AvatarImage src="https://api.dicebear.com/7.x/avataaars/svg?seed=Sarah" />
-              <AvatarFallback>SJ</AvatarFallback>
-            </Avatar>
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button variant="ghost" className="relative h-8 w-8 rounded-full">
+                  <Avatar className="h-8 w-8">
+                    <AvatarImage src={userAvatar} />
+                    <AvatarFallback>{userInitials}</AvatarFallback>
+                  </Avatar>
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end">
+                <DropdownMenuLabel>
+                  <div className="flex flex-col space-y-1">
+                    <p className="text-sm font-medium leading-none">{profile?.full_name || "User"}</p>
+                    <p className="text-xs leading-none text-muted-foreground">{user?.email}</p>
+                  </div>
+                </DropdownMenuLabel>
+                <DropdownMenuSeparator />
+                <DropdownMenuItem onClick={() => navigate("/client/settings")}>
+                  <Settings className="mr-2 h-4 w-4" />
+                  Settings
+                </DropdownMenuItem>
+                <DropdownMenuSeparator />
+                <DropdownMenuItem onClick={handleSignOut}>
+                  <LogOut className="mr-2 h-4 w-4" />
+                  Sign Out
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
           </div>
         </header>
 
